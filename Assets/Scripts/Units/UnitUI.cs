@@ -7,6 +7,7 @@ namespace Units
     public class UnitUI : MonoBehaviour
     {
         [SerializeField] private Image _healthBar;
+        [SerializeField] private bool _isLookAtCamera;
         private Camera _camera;
         private Unit _unit;
         
@@ -15,12 +16,13 @@ namespace Units
             _camera = Camera.main;
             _unit = unit;
             unit.Health.DamageApplied += DamageApplied;
-            UpdateHealthBar(1);
+            DamageApplied(0);
         }
 
         private void Update()
         {
-            LookAtCamera();
+            if (_isLookAtCamera)
+                LookAtCamera();
         }
 
         private void LookAtCamera()
@@ -30,7 +32,8 @@ namespace Units
 
         private void DamageApplied(int obj)
         {
-            UpdateHealthBar(_unit.Health.FillValue);
+            if (_healthBar != null)
+                UpdateHealthBar(_unit.Health.FillValue);
         }
 
         private void UpdateHealthBar(float fillValue)

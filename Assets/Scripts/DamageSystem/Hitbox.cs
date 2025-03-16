@@ -7,8 +7,10 @@ namespace DamageSystem
     {
         [SerializeField] private int _damageValue;
         [SerializeField] private DamageType _damageType;
-
+        [SerializeField] private LayerMask _layerMask;
+        
         public int Value => _damageValue;
         public DamageType Type => _damageType;
+        public LayerMask Layer => _layerMask;
     }
 }
