@@ -1,11 +1,8 @@
-using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Units.Player.Weapon
+namespace Units
 {
-    [RequireComponent(typeof(Weapon))]
-    public class WeaponMover : MonoBehaviour
+    public class PhysicalMover : MonoBehaviour
     {
         [Header("Ground Ray")]
         [SerializeField] private float _distanceToFloor = 0.6f;
@@ -21,29 +18,36 @@ namespace Units.Player.Weapon
         [SerializeField] private float _springDamper = 100f;
         [SerializeField] private float _rotationSpringStrength = 100f;
         [SerializeField] private float _rotationSpringDamper = 20f;
-        [SerializeField] private Transform _pivot;
         [SerializeField] private Rigidbody _rigidbody;
         private Quaternion _targetRotation;
         private Vector3 _moveVector;
         private Vector3 _goalVelocity;
         private Vector3 _direction;
-        
-        public bool IsOnGround
-        {
-            get; private set;
-        }
-        
-        private void Update()
-        {
-            SetMoveDirection(_pivot.position - transform.position);
-            SetTargetRotation();
-        }
+        private float _degree;
+        private float _sensitivity = 0.1f;
 
-        private void SetMoveDirection(Vector3 directoion)
+        private bool IsOnGround { get; set; }
+
+        public void SetMoveDirection(Vector3 directoion)
         {
             _direction = directoion;
         }
 
+        public void SetRotationDegree(float rotationAngle)
+        {
+            _degree += rotationAngle * _sensitivity;
+            if (_degree >= 360) _degree = 0;
+            else if (_degree < 0) _degree = 360;
+            var newRotation = Quaternion.Euler(new Vector3(0, _degree, 0));
+            SetRotation(newRotation);
+        }
+
+        public void SetRotation(Quaternion rotation)
+        {
+            _targetRotation = Quaternion.Lerp(_targetRotation, rotation, 
+                Time.deltaTime * _rotationSpeed);
+        }
+        
         private void FixedUpdate()
         {
             IsOnGround = CheckGround(out var hit);
@@ -94,7 +98,7 @@ namespace Units.Player.Weapon
 
         private void RotationStabilization()
         {
-            var toGoal = _targetRotation * Quaternion.Inverse(transform.rotation);
+            var toGoal = _targetRotation * Quaternion.Inverse(_rigidbody.transform.rotation);
 
             toGoal.ToAngleAxis(out var rotDegrees, out var rotAxis);
             rotAxis.Normalize();
@@ -110,12 +114,8 @@ namespace Units.Player.Weapon
 
         private bool CheckGround(out RaycastHit hit)
         {
-            return Physics.Raycast(transform.position, -Vector3.up, out hit, _distanceToFloor * 2, _groundLayers);
-        }
-        
-        private void SetTargetRotation()
-        {
-            _targetRotation = Quaternion.Lerp(_targetRotation, _pivot.rotation, Time.deltaTime * _rotationSpeed);
+            return Physics.Raycast(_rigidbody.transform.position, -Vector3.up, 
+                out hit, _distanceToFloor * 2, _groundLayers);
         }
     }
 }

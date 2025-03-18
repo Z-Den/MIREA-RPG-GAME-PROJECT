@@ -15,10 +15,10 @@ namespace Units.Enemy.StateMachine
         
         public void Init(Enemy enemy)
         {
-            Debug.Log(_dangerStateTypeState);
             switch (_defaultStateType)
             {
                 case DefaultStateType.Off:
+                    
                     _defaultState = new OffState(enemy);
                     break;
                 case DefaultStateType.Idle:
@@ -40,19 +40,22 @@ namespace Units.Enemy.StateMachine
                 case DangerStateType.RunAway:
                     break;
             }   
-            _defaultState.IsStateChange += IsStateChange;
+            _defaultState.IsStateChange += ChangeState;
+            ChangeState();
         }
 
         public void Update()
         {
             _currentState?.OnUpdate();
+            
         }
 
-        private void IsStateChange()
+        private void ChangeState()
         {
-            _currentState.OnExit();
+            _currentState?.OnExit();
             _currentState = _currentState == _defaultState ? _dangerState : _defaultState;
-            _currentState.OnEnter();
+            _currentState?.OnEnter();
+            Debug.Log(_currentState);
         }
     }
 }

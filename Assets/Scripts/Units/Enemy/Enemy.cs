@@ -7,14 +7,23 @@ namespace Units.Enemy
 {
     public class Enemy : Unit
     {
-        public EnemyParameters Parameters;
-        public EnemyStateMachine StateMachine;
+        [SerializeField] private PhysicalMover _mover;
+        [SerializeField] private EnemyParameters _parameters;
+        [SerializeField] private EnemyStateMachine _stateMachine;
+        
+        public PhysicalMover Mover => _mover;
+        public EnemyParameters Parameters => _parameters;
+        public EnemyStateMachine StateMachine => _stateMachine;
         
         protected override void Initialized()
         { 
             base.Initialized();
-            StateMachine.Init(this);
+            _stateMachine.Init(this);
         }
 
+        private void Update()
+        {
+            _stateMachine.Update();
+        }
     }
 }

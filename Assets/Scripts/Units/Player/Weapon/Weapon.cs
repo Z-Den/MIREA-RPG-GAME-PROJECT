@@ -9,7 +9,9 @@ namespace Units.Player.Weapon
         [SerializeField] private LayerMask _layerMask;
         [SerializeField] private Rigidbody _rigidbody;
         [SerializeField] private float _recoilPower = 1000;
-        [SerializeField] private float _shotCooldown = 10f;
+        [SerializeField] private float _shotCooldown = 30f;
+        [SerializeField] private PhysicalMover _physicalMover;
+        [SerializeField] private Transform _pivot; 
         private PlayerInput _playerInput;
         private float _cooldown;
 
@@ -30,6 +32,9 @@ namespace Units.Player.Weapon
                 _cooldown = _cooldown < 0? 0 : _cooldown;
                 CooldownChanged?.Invoke(_cooldown, _shotCooldown);
             }
+            
+            _physicalMover.SetMoveDirection(_pivot.position - transform.position);
+            _physicalMover.SetRotation(_pivot.rotation);
         }
 
         private void Shot()

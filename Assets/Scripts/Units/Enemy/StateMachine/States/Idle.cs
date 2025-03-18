@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Units.Enemy.StateMachine.States
 {
-    public class Idle : State
+    public class Idle : OffState
     {
         private float _timer = 0;
         private readonly float _checkDelay;
@@ -11,18 +11,18 @@ namespace Units.Enemy.StateMachine.States
         
         public Idle(Enemy enemy) : base(enemy)
         {
-            Debug.Log(enemy.Parameters.CheckDelay);
             _checkSphereRange = enemy.Parameters.CheckSphereRadius;
             _checkDelay = enemy.Parameters.CheckDelay;
             _respondMask = enemy.Parameters.RespondMask;
         }
 
-        public override void OnEnter()
+        public override void OnUpdate()
         {
-            
+            base.OnUpdate();
+            SetTimer();
         }
 
-        public override void OnUpdate()
+        protected void SetTimer()
         {
             if (_timer < 0)
             {
@@ -38,10 +38,6 @@ namespace Units.Enemy.StateMachine.States
             var colliders = Physics.OverlapSphere(Enemy.transform.position, _checkSphereRange, _respondMask);
             if (colliders != null)
                 IsStateChange?.Invoke();
-        }
-
-        public override void OnExit()
-        {
         }
     }
 }

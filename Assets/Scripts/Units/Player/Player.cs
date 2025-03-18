@@ -10,6 +10,7 @@ namespace Units.Player
         [SerializeField] private Rigidbody _rigidbody;
         [SerializeField] private Weapon.Weapon _weapon;
         [SerializeField] private PlayerUI _playerUI;
+        [SerializeField] private PhysicalMover _physicalMover;
         private PlayerMover _playerMover;
 
         public Weapon.Weapon Weapon => _weapon;
@@ -29,7 +30,11 @@ namespace Units.Player
         private void Update()
         {
             PlayerInput.Update();
-            _playerMover.Update();
+            //_playerMover.Update();
+            var moveDirection = (PlayerInput.MoveDirection.y * _rigidbody.transform.forward + 
+                                 PlayerInput.MoveDirection.x * _rigidbody.transform.right);
+            _physicalMover.SetMoveDirection(moveDirection);
+            _physicalMover.SetRotationDegree(PlayerInput.Rotation);
         }
     }
 }
