@@ -4,45 +4,38 @@ using UnityEngine.Serialization;
 
 namespace Units.Player
 {
-    public class PlayerMover : MonoBehaviour
+    public class PlayerMover
     {
-        [SerializeField] private Rigidbody _rigidbody;
-        [SerializeField] private float _moveSpeed;
-        [SerializeField] private float _rotationSpeed;
-        private PlayerInput _playerInput;
+        private readonly PlayerInput _playerInput;
+        private Rigidbody _rigidbody;
+        private float _moveSpeed = 5f;
+        private float _rotationSpeed = 10f;
         private float _rotation;
+
+        public PlayerMover(Player player)
+        {
+            _rigidbody = player.Rigidbody;
+            _playerInput = player.PlayerInput;
+        }
         
-        private void OnEnable()
+        public void Update()
         {
-            _playerInput = new PlayerInput();
-            _playerInput.Enable();
+            Move(_playerInput.MoveDirection);
+            Rotate(_playerInput.Rotation);
         }
 
-        private void OnDisable()
+        private void Move(Vector2 input)
         {
-            _playerInput.Disable();
-        }
-
-
-        private void Update()
-        {
-            var moveInput = _playerInput.Player.Move.ReadValue<Vector2>();
-            var moveDirection = new Vector3(moveInput.x, 0, moveInput.y).normalized;
-            Move(moveDirection);
-            
-            var rotationInput = _playerInput.Player.Rotation.ReadValue<float>();
-            Rotate(rotationInput);
-        }
-
-        private void Move(Vector3 direction)
-        {
-            _rigidbody.linearVelocity = direction * _moveSpeed;
+            var direction = new Vector3(input.x, 0, input.y).normalized;
+            var value = (direction.z * _rigidbody.transform.forward + direction.x * _rigidbody.transform.right) * _moveSpeed;
+            _rigidbody.linearVelocity = value;
         }
 
         private void Rotate(float rotationDegree)
         {
             _rotation += rotationDegree * Time.deltaTime * _rotationSpeed;
-            transform.rotation = Quaternion.Euler(0, _rotation, 0);
+            _rigidbody.transform.rotation = Quaternion.Euler(0, _rotation, 0);
         }
+
     }
 }

@@ -11,7 +11,7 @@ namespace Units
         private Camera _camera;
         private Unit _unit;
         
-        public void Init(Unit unit)
+        public virtual void Init(Unit unit)
         {
             _camera = Camera.main;
             _unit = unit;

@@ -12,6 +12,11 @@ namespace Units
             
         private void Awake()
         {
+            Initialized();
+        }
+
+        protected virtual void Initialized()
+        {
             Health = new UnitHealth(_maxHealth);
             Health.OnDeath += OnDeath;
             foreach (var ui in _unitUI)
