@@ -9,8 +9,8 @@ namespace Units
         public int Health { get; private set; }
         public readonly int MaxHealth;
         public Action OnDeath;
+        public Action<int, int> HealthChanged;
         public Action<int> DamageApplied;
-        public float FillValue => (float)Health / MaxHealth;
 
 
         public UnitHealth(int maxHealthValue)
@@ -23,6 +23,7 @@ namespace Units
         {
             var damageValue = damage.Value;
             Health -= damageValue;
+            HealthChanged?.Invoke(Health, MaxHealth);
             if (Health <= 0)
                 Die();
             DamageApplied?.Invoke(damageValue);

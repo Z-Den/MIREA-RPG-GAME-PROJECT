@@ -8,29 +8,28 @@ namespace Units.Player
     {
         [Header("Player settings")]
         [SerializeField] private Rigidbody _rigidbody;
-        [SerializeField] private Weapon.Weapon _weapon;
         [SerializeField] private PlayerUI _playerUI;
         [SerializeField] private PhysicalMover _physicalMover;
-        private PlayerMover _playerMover;
-
-        public Weapon.Weapon Weapon => _weapon;
-        public PlayerInput PlayerInput {get; private set;}
+        [SerializeField] private PlayerInput _playerInput;
+        [SerializeField] private Shield _shield;
+        
+        public PlayerInput PlayerInput => _playerInput;
         public SpellHolder SpellHolder {get; private set;}
         public Rigidbody Rigidbody => _rigidbody;
         
         protected override void Initialized()
         {
             base.Initialized();
-            PlayerInput = new PlayerInput();
             SpellHolder = new SpellHolder();
-            _playerMover = new PlayerMover(this);
-            _weapon.Init(this);
         }
 
         private void Update()
         {
-            PlayerInput.Update();
-            //_playerMover.Update();
+            ApplyMove();
+        }
+
+        private void ApplyMove()
+        {
             var moveDirection = (PlayerInput.MoveDirection.y * _rigidbody.transform.forward + 
                                  PlayerInput.MoveDirection.x * _rigidbody.transform.right);
             _physicalMover.SetMoveDirection(moveDirection);

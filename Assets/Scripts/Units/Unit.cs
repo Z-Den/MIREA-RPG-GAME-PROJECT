@@ -7,7 +7,6 @@ namespace Units
     public abstract class Unit : MonoBehaviour, IDamageable
     {
         [SerializeField] private int _maxHealth = 100;
-        [SerializeField] private UnitUI[] _unitUI;
         public UnitHealth Health; 
             
         private void Awake()
@@ -19,8 +18,6 @@ namespace Units
         {
             Health = new UnitHealth(_maxHealth);
             Health.OnDeath += OnDeath;
-            foreach (var ui in _unitUI)
-                ui.Init(this);
         }
 
         private void OnDeath()

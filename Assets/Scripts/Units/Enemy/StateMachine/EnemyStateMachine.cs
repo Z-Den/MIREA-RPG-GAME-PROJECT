@@ -47,7 +47,6 @@ namespace Units.Enemy.StateMachine
         public void Update()
         {
             _currentState?.OnUpdate();
-            
         }
 
         private void ChangeState()
@@ -55,7 +54,6 @@ namespace Units.Enemy.StateMachine
             _currentState?.OnExit();
             _currentState = _currentState == _defaultState ? _dangerState : _defaultState;
             _currentState?.OnEnter();
-            Debug.Log(_currentState);
         }
     }
 }

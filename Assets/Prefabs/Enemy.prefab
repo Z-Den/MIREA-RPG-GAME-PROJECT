@@ -202,8 +202,8 @@ GameObject:
   - component: {fileID: 598103405436776931}
   - component: {fileID: 829419190922820669}
   - component: {fileID: 7263886727840159771}
-  - component: {fileID: 632893560403836166}
   - component: {fileID: 6709458404537282957}
+  - component: {fileID: 6294434491567270166}
   m_Layer: 8
   m_Name: Enemy
   m_TagString: Untagged
@@ -343,18 +343,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHealth: 100
-  _unitUI:
-  - {fileID: 7444432703827794785}
   _mover: {fileID: 6709458404537282957}
   _parameters:
     CheckSphereRadius: 0
     CheckDelay: 0
     RespondMask:
       serializedVersion: 2
-      m_Bits: 64
-    Path: []
+      m_Bits: 0
+    Path:
+    - {x: 13, y: 0, z: 0}
+    - {x: 13, y: 0, z: 13}
+    - {x: 0, y: 0, z: 0}
   _stateMachine:
-    _defaultStateType: 0
+    _defaultStateType: 2
     _dangerStateTypeState: 0
 --- !u!114 &7263886727840159771
 MonoBehaviour:
@@ -373,27 +374,6 @@ MonoBehaviour:
   _layerMask:
     serializedVersion: 2
     m_Bits: 64
---- !u!135 &632893560403836166
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5029952550233627752}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.7
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6709458404537282957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -406,13 +386,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ae07ad6f3894c5aa48badb19e58f449, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _distanceToFloor: 2
+  _distanceToFloor: 1
   _groundLayers:
     serializedVersion: 2
     m_Bits: 8
-  _maxSpeed: 5
-  _accelerationPower: 20
-  _maxAcceleration: 100
+  _maxSpeed: 0.1
+  _accelerationPower: 200
+  _maxAcceleration: 10
   _accelerationFromDot:
     serializedVersion: 2
     m_Curve:
@@ -452,6 +432,29 @@ MonoBehaviour:
   _rotationSpringStrength: 100
   _rotationSpringDamper: 20
   _rigidbody: {fileID: 598103405436776931}
+--- !u!136 &6294434491567270166
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5029952550233627752}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.6
+  m_Height: 2.2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8891247667009566083
 GameObject:
   m_ObjectHideFlags: 0
@@ -569,3 +572,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _healthBar: {fileID: 8179647607905032836}
   _isLookAtCamera: 1
+  Unit: {fileID: 829419190922820669}
