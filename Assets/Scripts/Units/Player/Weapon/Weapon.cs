@@ -1,14 +1,15 @@
 using System;
 using System.Collections;
 using DamageSystem;
+using Units.UI;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Units.Player.Weapon
 {
-    public class Weapon : MonoBehaviour
+    public class Weapon : MonoBehaviour, IUIElementHolder
     {
-        [SerializeField] private Player _player;
-        [SerializeField] private LayerMask _layerMask;
+        [SerializeField] private LayerMask _damageMask;
         [SerializeField] private Rigidbody _rigidbody;
         [SerializeField] private float _recoilPower = 1000;
         [SerializeField] private float _shotCooldown = 30f;
@@ -18,9 +19,14 @@ namespace Units.Player.Weapon
         [SerializeField] private TrailRenderer _trailPrefab;
         [SerializeField] private float _trailSpeed = 20f; 
         [SerializeField] private float _shootDistance;
-        private PlayerInput _playerInput;
+        [SerializeField] private PlayerInput _playerInput;
+        [Header("UI")]
+        [SerializeField] private UnitUI _unitUI;
+        [SerializeField] private PlayerShootBar _shootBarPrefab;
+        public UnitUI UI => _unitUI;
         private float _cooldown;
         private float _shotChargeTimer;
+        private PlayerShootBar _shotBar;
 
         private bool IsCanShoot => _cooldown <= 0;
         
@@ -29,20 +35,18 @@ namespace Units.Player.Weapon
 
         private void OnEnable()
         {
-            _playerInput = _player.PlayerInput;
             _playerInput.ShotStarted += StartChargeShot;
             _playerInput.ShotCanceled += Shot;
+            SetUIElement();
             CooldownChanged?.Invoke(0, 1);
             ChargeTimerChanged?.Invoke(1, 1);
         }
 
         private void OnDisable()
         {
-            _playerInput = _player.PlayerInput;
-            _playerInput.ShotStarted += StartChargeShot;
-            _playerInput.ShotCanceled += Shot;
-            CooldownChanged?.Invoke(0, 1);
-            ChargeTimerChanged?.Invoke(1, 1);
+            RemoveUIElement();
+            _playerInput.ShotStarted -= StartChargeShot;
+            _playerInput.ShotCanceled -= Shot;
         }
 
         private void StartChargeShot()
@@ -57,6 +61,9 @@ namespace Units.Player.Weapon
         {
             UpdateTimer(ref _cooldown, ref _shotCooldown, ref CooldownChanged);
             UpdateTimer(ref _shotChargeTimer, ref _shotChargeTime, ref ChargeTimerChanged);
+            
+            if (!_pivot)
+                return;
             
             _physicalMover.SetMoveDirection(_pivot.position - transform.position);
             _physicalMover.SetRotation(_pivot.rotation);
@@ -79,12 +86,12 @@ namespace Units.Player.Weapon
             var shootDistance = _shootDistance;
             
             var raycastHits = Physics.BoxCastAll(transform.position, Vector3.one,
-                transform.forward, Quaternion.identity, shootDistance, _layerMask);
+                transform.forward, Quaternion.identity, shootDistance, _damageMask);
             foreach (var hit in raycastHits)
             {
                 if (!hit.collider.TryGetComponent(out IDamageable damageable)) continue;
                 
-                var damage = new Damage(30, DamageType.Magical, _layerMask);
+                var damage = new Damage(30, DamageType.Magical, _damageMask);
                 damageable.ApplyDamage(damage);
             }
             _rigidbody.AddForce(-transform.forward * _recoilPower);
@@ -108,6 +115,20 @@ namespace Units.Player.Weapon
                 yield return null;
             }
             Destroy(trail.gameObject);
+        }
+
+        public void SetUIElement()
+        {
+            _shotBar = Instantiate(_shootBarPrefab);
+            CooldownChanged += _shotBar.CooldownChanged;
+            ChargeTimerChanged += _shotBar.ChargeTimerChanged;
+            UI.Add(_shotBar);
+        }
+
+        public void RemoveUIElement()
+        {
+            CooldownChanged -= _shotBar.CooldownChanged;
+            ChargeTimerChanged -= _shotBar.ChargeTimerChanged;
         }
     }
 }

@@ -8,7 +8,6 @@ namespace Units.Player
     {
         [Header("Player settings")]
         [SerializeField] private Rigidbody _rigidbody;
-        [SerializeField] private PlayerUI _playerUI;
         [SerializeField] private PhysicalMover _physicalMover;
         [SerializeField] private PlayerInput _playerInput;
         [SerializeField] private Shield _shield;

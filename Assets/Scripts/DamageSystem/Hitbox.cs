@@ -12,5 +12,7 @@ namespace DamageSystem
         public int Value => _damageValue;
         public DamageType Type => _damageType;
         public LayerMask Layer => _layerMask;
+        
+        public virtual void CollideWith(IDamageable damageable){}
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Units.Health;
 using Units.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,13 +8,13 @@ namespace GameManager
 {
     public class GameManager : MonoBehaviour
     {
-        [SerializeField] private Player _player;
-        [SerializeField] private PlayerUI _playerUI;
+        [SerializeField] private UnitHealth _playerHealth;
+        [SerializeField] private GameObject _deadPanel;
 
-        private void Start()
+        private void Awake()
         {
-            _playerUI.SetDeadPanelVisible(false);
-            _player.Health.OnDeath += OnDeath;
+            _deadPanel.SetActive(false);
+            _playerHealth.OnDeath += OnDeath;
         }
 
         public void RestartGame()
@@ -23,7 +24,7 @@ namespace GameManager
 
         private void OnDeath()
         {
-            _playerUI.SetDeadPanelVisible(true);
+            _deadPanel.SetActive(true);
         }
     }
 }

@@ -7,5 +7,7 @@ namespace DamageSystem
         public int Value { get; }
         public DamageType Type { get; }
         public LayerMask Layer { get; }
+
+        public void CollideWith(IDamageable damageable);
     }
 }
