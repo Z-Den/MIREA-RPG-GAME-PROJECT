@@ -1,27 +1,35 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DamageSystem;
 using Units.UI;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Units.Health
 {
     public class UnitHealth : MonoBehaviour, IDamageable, IUIElementHolder
     {
         [SerializeField] private float _maxHealth;
+        [Header("Resistances")]
+        [SerializeField] private DamageType[] _damageResistances;
+        [SerializeField] private DamageType[] _damageImmunities;
         [Header("UI")]
         [SerializeField] private UnitUI _unitUI;
         [SerializeField] private Bar _healthBarPrefab;
         private float _health;
         private Bar _healthBar;
+        private List<IDamage> _damageImmunitySources;
+        private float _damageImmunityTime = 0.5f;
+        
         public Action OnDeath;
         public Action<float, float> HealthChanged;
         public Action<float> DamageApplied;
         public UnitUI UI => _unitUI;
+        public DamageType[] DamageResistances => _damageResistances;
+        public DamageType[] DamageImmunities => _damageImmunities;
         
-        private List<IDamage> _damageImmunitySources;
-        private float _damageImmunityTime = 0.5f;
         
         private void OnEnable()
         {
@@ -45,15 +53,26 @@ namespace Units.Health
                 ApplyDamage(damage);
             }
         }
-        
+
+
         public void ApplyDamage(IDamage damage)
         {
-            var damageValue = damage.Value;
+            var damageValue = CalculateDamage(damage);
             _health -= damageValue;
             HealthChanged?.Invoke(_health, _maxHealth);
             if (_health <= 0)
                 Die();
             DamageApplied?.Invoke(damageValue);
+            Debug.Log(damage);
+        }
+
+        private float CalculateDamage(IDamage damage)
+        {
+            if (DamageImmunities.Contains(damage.Type))
+                return 0;
+            if (DamageResistances.Contains(damage.Type))
+                return damage.Value / 2;
+            return damage.Value;
         }
 
         private IEnumerator DamageImmunity(IDamage souse)

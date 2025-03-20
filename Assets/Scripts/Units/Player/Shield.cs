@@ -15,7 +15,7 @@ namespace Units.Player
         [SerializeField] private GameObject _shield;
         [SerializeField] private LayerMask _interactLayer;
         [Header("UI")]
-        [SerializeField] private ShieldBar _shieldBarPrefab;
+        [SerializeField] private TwoSideBar _shieldBarPrefab;
         [SerializeField] private UnitUI _unitUI;
         [Header("Parameters")]
         [SerializeField] private float _maxHealth;
@@ -23,7 +23,7 @@ namespace Units.Player
         [SerializeField] private float _maxShieldSize;
         [SerializeField] private float _sizeChangeSpeed;
         private float _health;
-        private ShieldBar _shieldBar;
+        private TwoSideBar _shieldBar;
         private float _currentSize;
         private float _goatSize;
         private List<IDamage> _damageImmunitySources;

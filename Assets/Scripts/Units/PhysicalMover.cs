@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Units
 {
@@ -18,7 +19,7 @@ namespace Units
         [SerializeField] private float _springDamper = 100f;
         [SerializeField] private float _rotationSpringStrength = 100f;
         [SerializeField] private float _rotationSpringDamper = 20f;
-        [SerializeField] private Rigidbody _rigidbody;
+        [SerializeField] protected Rigidbody Rigidbody;
         private Quaternion _targetRotation;
         private Vector3 _moveVector;
         private Vector3 _goalVelocity;
@@ -26,7 +27,8 @@ namespace Units
         private float _degree;
         private float _sensitivity = 0.1f;
 
-        private bool IsOnGround { get; set; }
+        public bool IsOnGround { get; private set; }
+        public virtual float MaxSpeed => _maxSpeed;
 
         public void SetMoveDirection(Vector3 directoion)
         {
@@ -62,21 +64,22 @@ namespace Units
         private void HorizontalMove()
         {
             var move = _direction;
-
-            var velocityDot = Vector3.Dot(move, _rigidbody.linearVelocity);
+            if (move.magnitude > 1f) move.Normalize();
+            
+            var velocityDot = Vector3.Dot(move, Rigidbody.linearVelocity);
             var acceleration = _accelerationPower * _accelerationFromDot.Evaluate(velocityDot);
 
-            var velocity = move * _maxSpeed;
+            var velocity = move * MaxSpeed;
             _goalVelocity = Vector3.MoveTowards(_goalVelocity, velocity, acceleration * Time.fixedDeltaTime);
 
-            var neededAccel = (_goalVelocity - _rigidbody.linearVelocity) / Time.fixedDeltaTime;
+            var neededAccel = (_goalVelocity - Rigidbody.linearVelocity) / Time.fixedDeltaTime;
             neededAccel = Vector3.ClampMagnitude(neededAccel, _maxAcceleration);
-            _rigidbody.AddForce(neededAccel * _rigidbody.mass);
+            Rigidbody.AddForce(neededAccel * Rigidbody.mass);
         }
 
         private void Floating(RaycastHit hit)
         {
-            var velocity = _rigidbody.linearVelocity;
+            var velocity = Rigidbody.linearVelocity;
             var rayDirection = -Vector3.up;
 
             var otherVelocity = Vector3.zero;
@@ -90,7 +93,7 @@ namespace Units
             var relVel = rayDirVelocity - otherDirVelocity;
             var deltaX = hit.distance - _distanceToFloor;
             var springForce = (deltaX * _springStrength) - (relVel * _springDamper);
-            _rigidbody.AddForce(rayDirection * springForce);
+            Rigidbody.AddForce(rayDirection * springForce);
 
             if (hitbody)
                 hitbody.AddForceAtPosition(rayDirection * -springForce, hit.point);
@@ -98,7 +101,7 @@ namespace Units
 
         private void RotationStabilization()
         {
-            var toGoal = _targetRotation * Quaternion.Inverse(_rigidbody.transform.rotation);
+            var toGoal = _targetRotation * Quaternion.Inverse(Rigidbody.transform.rotation);
 
             toGoal.ToAngleAxis(out var rotDegrees, out var rotAxis);
             rotAxis.Normalize();
@@ -108,13 +111,13 @@ namespace Units
             
             var rotRadians = rotDegrees * Mathf.Deg2Rad;
             
-            _rigidbody.AddTorque((rotAxis * (rotRadians * _rotationSpringStrength)) -
-                                 (_rigidbody.angularVelocity * _rotationSpringDamper));
+            Rigidbody.AddTorque((rotAxis * (rotRadians * _rotationSpringStrength)) -
+                                 (Rigidbody.angularVelocity * _rotationSpringDamper));
         }
 
         private bool CheckGround(out RaycastHit hit)
         {
-            return Physics.Raycast(_rigidbody.transform.position, -Vector3.up, 
+            return Physics.Raycast(Rigidbody.transform.position, -Vector3.up, 
                 out hit, _distanceToFloor * 2, _groundLayers);
         }
     }

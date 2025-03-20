@@ -21,7 +21,7 @@ namespace Units.Enemy.StateMachine.States
 
         public override void OnUpdate()
         {
-            //SetTimer();
+            SetTimer();
             MoveByPath();
         }
 
@@ -30,7 +30,7 @@ namespace Units.Enemy.StateMachine.States
             var isToClose = (_path[_currentPathIndex] - Enemy.transform.position).magnitude < _minDistanceToPoint;
             if (isToClose)
                 _currentPathIndex++;
-            
+
             if (_currentPathIndex >= _path.Length)
                 _currentPathIndex = 0;
 

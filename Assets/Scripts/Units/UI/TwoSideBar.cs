@@ -1,18 +1,27 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Units.UI
 {
-    public class ShieldBar : UIElement
+    public class TwoSideBar : UIElement
     {
+        [SerializeField] private Color _frontColor = Color.white;
+        [SerializeField] private Color _backgroundColor = Color.white;
         [SerializeField] private Image[] _images;
         [SerializeField] private Image[] _otherElements;
         private readonly float _noInteractTime = 3f;
         private readonly float _alphaSpeed = 0.5f;
         private float _timer = 0;
         private float _alpha = 1;
-        
+
+        private void OnValidate()
+        {
+            SetColorFor(_images, _frontColor, 1);
+            SetColorFor(_otherElements, _backgroundColor, 1);
+        }
+
         public void FillBar(float current, float max)
         {
             foreach (var image in _images)
@@ -35,12 +44,16 @@ namespace Units.UI
             }
             
             _alpha = Mathf.Clamp(_alpha, 0, 1);
-            
-            foreach (var image in _images)
-                image.color = new Color(1,1, 1, _alpha);
+            SetColorFor(_images, _frontColor, _alpha);
+            SetColorFor(_otherElements, _backgroundColor, _alpha);
+        }
 
-            foreach (var image in _otherElements)
-                image.color = new Color(1, 1, 1, _alpha);
+        private void SetColorFor( Image[] images, Color baseColor, float alpha = 1)
+        {
+            var color = baseColor;
+            color.a = alpha;
+            foreach (var image in images)
+                image.color = color;
         }
     }
 }

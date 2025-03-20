@@ -18,7 +18,6 @@ namespace Units.Enemy.StateMachine
             switch (_defaultStateType)
             {
                 case DefaultStateType.Off:
-                    
                     _defaultState = new OffState(enemy);
                     break;
                 case DefaultStateType.Idle:
@@ -32,15 +31,18 @@ namespace Units.Enemy.StateMachine
             switch (_dangerStateTypeState)
             {
                 case DangerStateType.Follow:
+                    _dangerState = new Follow(enemy);
                     break;
                 case DangerStateType.FollowAndAttack:
                     break;
                 case DangerStateType.KeepDistanceAndAttack:
+                    _dangerState = new KeepDistanceAndAttack(enemy);
                     break;
                 case DangerStateType.RunAway:
                     break;
             }   
             _defaultState.IsStateChange += ChangeState;
+            _dangerState.IsStateChange += ChangeState;
             ChangeState();
         }
 

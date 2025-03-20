@@ -36,8 +36,10 @@ namespace Units.Enemy.StateMachine.States
         private void CheckPlayer()
         {
             var colliders = Physics.OverlapSphere(Enemy.transform.position, _checkSphereRange, _respondMask);
-            if (colliders != null)
+            if (colliders.Length > 0)
+            {
                 IsStateChange?.Invoke();
+            }
         }
     }
 }

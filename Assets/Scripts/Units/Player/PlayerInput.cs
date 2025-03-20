@@ -13,6 +13,8 @@ namespace Units.Player
         public Action ShotCanceled;
         public Action ShieldStarted;
         public Action ShieldCanceled;
+        public Action RunStarted;
+        public Action RunCanceled;
         
         public void Awake()
         {
@@ -24,6 +26,9 @@ namespace Units.Player
             
             _playerInput.Player.Shield.started += _ => ShieldStarted?.Invoke();
             _playerInput.Player.Shield.canceled += _ => ShieldCanceled?.Invoke();
+            
+            _playerInput.Player.Run.started += _ => RunStarted?.Invoke();
+            _playerInput.Player.Run.canceled += _ => RunCanceled?.Invoke();
         }
 
         public void Update()
