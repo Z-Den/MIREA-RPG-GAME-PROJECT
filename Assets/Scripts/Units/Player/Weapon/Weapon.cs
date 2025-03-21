@@ -23,6 +23,7 @@ namespace Units.Player.Weapon
         [Header("UI")]
         [SerializeField] private UnitUI _unitUI;
         [SerializeField] private PlayerShootBar _shootBarPrefab;
+        [SerializeField] private Bar _swordRunesBar;
         public UnitUI UI => _unitUI;
         private float _cooldown;
         private float _shotChargeTimer;
@@ -122,6 +123,7 @@ namespace Units.Player.Weapon
             _shotBar = Instantiate(_shootBarPrefab);
             CooldownChanged += _shotBar.CooldownChanged;
             ChargeTimerChanged += _shotBar.ChargeTimerChanged;
+            ChargeTimerChanged += _swordRunesBar.UpdateBar;
             UI.Add(_shotBar);
         }
 
@@ -129,6 +131,7 @@ namespace Units.Player.Weapon
         {
             CooldownChanged -= _shotBar.CooldownChanged;
             ChargeTimerChanged -= _shotBar.ChargeTimerChanged;
+            ChargeTimerChanged -= _swordRunesBar.UpdateBar;
         }
     }
 }

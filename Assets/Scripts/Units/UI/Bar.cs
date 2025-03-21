@@ -10,7 +10,8 @@ namespace Units.UI
     {
         [SerializeField] private Image _bar;
         [SerializeField] private TMP_Text _value;
-
+        [SerializeField] private bool _invertedBarFill;
+        
         public void UpdateBar(float current, float max)
         {
             ChangeText(current, max);
@@ -29,8 +30,11 @@ namespace Units.UI
         {
             if (_bar == null)
                 return;
-            
-            _bar.fillAmount = current / max;
+
+            if (_invertedBarFill)
+                _bar.fillAmount = (max - current) / max;
+            else
+                _bar.fillAmount = current / max;
         }
     }
 }
