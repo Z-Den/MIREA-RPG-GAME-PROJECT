@@ -29,6 +29,10 @@ namespace Units
         [SerializeField] private float _staminaSpendPerSecond;
         [Header("UI")]
         [SerializeField] private TwoSideBar _staminaBarPrefab;
+        [SerializeField] protected Rigidbody Rigidbody; 
+        // а почему у вас Rb как SerializeField? Вы собираетесь вешать скрипт управления объектом X на объект Y?)
+        // надо наверное сделать это через обычное protected поле и вешать RequireComponent(Transform). Изучите как лучше это делается
+
         private Quaternion _targetRotation;
         private Rigidbody _rigidbody;
         private Vector3 _moveVector;

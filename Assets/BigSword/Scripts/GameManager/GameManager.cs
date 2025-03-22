@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 namespace GameManager
 {
     public class GameManager : MonoBehaviour
+    // А это случайно не должен быть синглтон? 
+    // А если такие компонента два на сцене появится че будет?
     {
         [SerializeField] private UnitHealth _playerHealth;
         [SerializeField] private GameObject _deadPanel;
