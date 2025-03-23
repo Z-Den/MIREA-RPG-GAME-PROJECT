@@ -12,7 +12,7 @@ namespace Units.UI
         [SerializeField] private TMP_Text _value;
         [SerializeField] private bool _invertedBarFill;
         
-        public void UpdateBar(float current, float max)
+        public virtual void UpdateBar(float current, float max)
         {
             ChangeText(current, max);
             FillBar(current, max);
@@ -26,7 +26,7 @@ namespace Units.UI
             _value.text = ((int)current) + " / " + ((int)max);
         }
 
-        protected void FillBar(float current, float max)
+        protected virtual void FillBar(float current, float max)
         {
             if (_bar == null)
                 return;

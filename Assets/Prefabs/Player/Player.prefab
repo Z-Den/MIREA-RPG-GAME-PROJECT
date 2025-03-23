@@ -334,9 +334,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHealth: 100
-  _damageResistances: 
-  _damageImmunities: 
-  _healthBarPrefab: {fileID: 1015252933189710948, guid: 27d1cef711ee08d499104936eba7f294, type: 3}
+  _damageResistances: 0000000001000000
+  _damageImmunities: 00000000
+  _healthBarPrefab: {fileID: -7664388313301540517, guid: 27d1cef711ee08d499104936eba7f294, type: 3}
 --- !u!114 &8717231548375476530
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -16,7 +16,7 @@ namespace Units.Health
         [SerializeField] private DamageType[] _damageResistances;
         [SerializeField] private DamageType[] _damageImmunities;
         [Header("UI")]
-        [SerializeField] private Bar _healthBarPrefab;
+        [SerializeField] private HealthBar _healthBarPrefab;
         private float _health;
         private List<IDamage> _damageImmunitySources;
         private float _damageImmunityTime = 0.5f;
@@ -24,15 +24,16 @@ namespace Units.Health
         public Action OnDeath;
         public Action<float, float> HealthChanged;
         public Action<float> DamageApplied;
+        public Action<DamageType[], DamageType[]> ResistanceChanged;
         public DamageType[] DamageResistances => _damageResistances;
         public DamageType[] DamageImmunities => _damageImmunities;
         
-        
-        private void OnEnable()
+        private void Start()
         {
             _damageImmunitySources = new List<IDamage>();
             _health = _maxHealth;
             HealthChanged?.Invoke(_health, _maxHealth);
+            ResistanceChanged?.Invoke(DamageImmunities, DamageResistances);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -59,7 +60,6 @@ namespace Units.Health
             if (_health <= 0)
                 Die();
             DamageApplied?.Invoke(damageValue);
-            Debug.Log(damage);
         }
 
         private float CalculateDamage(IDamage damage)
@@ -88,6 +88,7 @@ namespace Units.Health
         {
             var healthBar = Instantiate(_healthBarPrefab);
             HealthChanged += healthBar.UpdateBar;
+            ResistanceChanged += healthBar.ResistanceIconsUpdate;
             return healthBar;
         }
     }

@@ -151,3 +151,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _offset: {x: 0, y: 20, z: -6}
+  _rotationOffset: {x: 60, y: 0, z: 0}

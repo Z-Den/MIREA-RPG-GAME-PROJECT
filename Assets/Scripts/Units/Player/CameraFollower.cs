@@ -7,19 +7,14 @@ namespace Units.Player
     public class CameraFollower : MonoBehaviour, IPivotFollower
     {
         [SerializeField] private Vector3 _offset;
-        private Vector3 _rotationOffset;
+        [SerializeField] private Vector3 _rotationOffset;
         private Transform _pivotTransform;
         Transform IPivotFollower.PivotTransform
         {
             get => _pivotTransform;
             set => _pivotTransform = value;
         }
-
-        private void Start()
-        {
-            _rotationOffset = transform.eulerAngles;
-        }
-
+        
         private void Update()
         {
             if (!_pivotTransform)

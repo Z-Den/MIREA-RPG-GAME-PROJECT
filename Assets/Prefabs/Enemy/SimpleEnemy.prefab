@@ -170,6 +170,7 @@ MonoBehaviour:
   _stateMachine:
     _defaultStateType: 2
     _dangerStateTypeState: 0
+  _unitUI: {fileID: 7444432703827794785}
 --- !u!114 &7263886727840159771
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,7 +245,11 @@ MonoBehaviour:
   _springDamper: 100
   _rotationSpringStrength: 100
   _rotationSpringDamper: 20
-  Rigidbody: {fileID: 598103405436776931}
+  _maxSpeedMultiplier: 2
+  _maxStamina: 0
+  _staminaRegenPerSecond: 0
+  _staminaSpendPerSecond: 0
+  _staminaBarPrefab: {fileID: 0}
 --- !u!136 &6294434491567270166
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -283,8 +288,7 @@ MonoBehaviour:
   _maxHealth: 100
   _damageResistances: 
   _damageImmunities: 
-  _unitUI: {fileID: 7444432703827794785}
-  _healthBarPrefab: {fileID: 4708852654805375431, guid: 3e34c4899c24b134ca0d4118d05cc402, type: 3}
+  _healthBarPrefab: {fileID: -5156587949176805526, guid: c1961202cd7d49848b71a2ba72fe982d, type: 3}
 --- !u!1 &8891247667009566083
 GameObject:
   m_ObjectHideFlags: 0
@@ -322,7 +326,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 2}
-  m_SizeDelta: {x: 4, y: 0.4}
+  m_SizeDelta: {x: 4, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &2746108476318254705
 Canvas:

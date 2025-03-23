@@ -551,7 +551,7 @@ Transform:
   m_GameObject: {fileID: 7642850731060332622}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.93, z: -6.67}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -599,7 +599,7 @@ Rigidbody:
   m_Mass: 10
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: -1}
+  m_CenterOfMass: {x: 0, y: 0, z: -1.5}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
@@ -630,7 +630,7 @@ MonoBehaviour:
   _distanceToFloor: 1.5
   _groundLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 24
   _maxSpeed: 10
   _accelerationPower: 2000
   _maxAcceleration: 200

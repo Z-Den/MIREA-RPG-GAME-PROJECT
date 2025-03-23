@@ -26,7 +26,7 @@ namespace Bootstrapper
             
             var items = new List<GameObject>(); 
             foreach (var itemPrefab in _playerItemPrefabs)
-                items.Add(Instantiate(itemPrefab));
+                items.Add(InstantiatePrefab(itemPrefab));
             
             ConfigureDependencies(items);
         }

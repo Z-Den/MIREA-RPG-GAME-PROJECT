@@ -1,5 +1,6 @@
 using System;
 using Units.Enemy.StateMachine.States;
+using Units.Input;
 using UnityEngine;
 
 namespace Units.Enemy.StateMachine
@@ -58,5 +59,6 @@ namespace Units.Enemy.StateMachine
             _currentState = _currentState == _defaultState ? _dangerState : _defaultState;
             _currentState?.OnEnter();
         }
+
     }
 }

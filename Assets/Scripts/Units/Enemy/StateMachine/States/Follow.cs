@@ -18,7 +18,7 @@ namespace Units.Enemy.StateMachine.States
         public override void OnEnter()
         {
             Taget = GetTarget();
-            if (Taget == null)
+            if (!Taget)
                 IsStateChange?.Invoke();
         }
 

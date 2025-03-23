@@ -20,7 +20,7 @@ namespace Units
             rect.offsetMin = Vector2.zero;
         }
         
-        protected virtual void OnEnable()
+        protected virtual void Start()
         {
             _camera = Camera.main;
         }
