@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Units.UI
 {
-    public class HealthBar : Bar
+    public class HealthBar : TwoSideBar
     {
         private const string ResistanceIconPath = "Sprites/Resistant/";
         private const string ImmunityIconPath = "Sprites/Immune/";

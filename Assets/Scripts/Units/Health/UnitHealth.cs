@@ -87,7 +87,7 @@ namespace Units.Health
         public UIElement GetUIElement()
         {
             var healthBar = Instantiate(_healthBarPrefab);
-            HealthChanged += healthBar.UpdateBar;
+            HealthChanged += healthBar.FillBar;
             ResistanceChanged += healthBar.ResistanceIconsUpdate;
             return healthBar;
         }

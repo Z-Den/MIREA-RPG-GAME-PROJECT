@@ -11,6 +11,7 @@ namespace Units.UI
         [SerializeField] private Color _backgroundColor = Color.white;
         [SerializeField] private Image[] _images;
         [SerializeField] private Image[] _otherElements;
+        [SerializeField] private bool _isInvisible;
         private readonly float _noInteractTime = 3f;
         private readonly float _alphaSpeed = 0.5f;
         private float _timer = 0;
@@ -33,6 +34,9 @@ namespace Units.UI
 
         private void Update()
         {
+            if (!_isInvisible)
+                return;
+            
             if (_timer < _noInteractTime)
             {
                 _timer += Time.deltaTime;
