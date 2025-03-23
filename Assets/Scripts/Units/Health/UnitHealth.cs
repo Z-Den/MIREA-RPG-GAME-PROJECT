@@ -16,17 +16,14 @@ namespace Units.Health
         [SerializeField] private DamageType[] _damageResistances;
         [SerializeField] private DamageType[] _damageImmunities;
         [Header("UI")]
-        [SerializeField] private UnitUI _unitUI;
         [SerializeField] private Bar _healthBarPrefab;
         private float _health;
-        private Bar _healthBar;
         private List<IDamage> _damageImmunitySources;
         private float _damageImmunityTime = 0.5f;
         
         public Action OnDeath;
         public Action<float, float> HealthChanged;
         public Action<float> DamageApplied;
-        public UnitUI UI => _unitUI;
         public DamageType[] DamageResistances => _damageResistances;
         public DamageType[] DamageImmunities => _damageImmunities;
         
@@ -35,7 +32,6 @@ namespace Units.Health
         {
             _damageImmunitySources = new List<IDamage>();
             _health = _maxHealth;
-            SetUIElement();
             HealthChanged?.Invoke(_health, _maxHealth);
         }
 
@@ -88,17 +84,11 @@ namespace Units.Health
             Destroy(gameObject);
         }
 
-        public void SetUIElement()
+        public UIElement GetUIElement()
         {
-            _healthBar = Instantiate(_healthBarPrefab);
-            HealthChanged += _healthBar.UpdateBar;
-            UI.Add(_healthBar);
-        }
-
-        public void RemoveUIElement()
-        {
-            HealthChanged -= _healthBar.UpdateBar;
-            Destroy(_healthBar);
+            var healthBar = Instantiate(_healthBarPrefab);
+            HealthChanged += healthBar.UpdateBar;
+            return healthBar;
         }
     }
 }

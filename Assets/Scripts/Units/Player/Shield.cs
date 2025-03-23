@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DamageSystem;
+using PivotConnection;
+using Units.Input;
 using Units.UI;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -9,21 +11,18 @@ using UnityEngine.Serialization;
 namespace Units.Player
 {
     [Serializable]
-    public class Shield : MonoBehaviour, IUIElementHolder
+    public class Shield : MonoBehaviour, IUIElementHolder, IUnitActionController, IPivotFollower
     {
-        [SerializeField] private PlayerInput _playerInput;
         [SerializeField] private GameObject _shield;
         [SerializeField] private LayerMask _interactLayer;
         [Header("UI")]
         [SerializeField] private TwoSideBar _shieldBarPrefab;
-        [SerializeField] private UnitUI _unitUI;
         [Header("Parameters")]
         [SerializeField] private float _maxHealth;
         [SerializeField] private float _regenerationPerSecond = 10f;
         [SerializeField] private float _maxShieldSize;
         [SerializeField] private float _sizeChangeSpeed;
         private float _health;
-        private TwoSideBar _shieldBar;
         private float _currentSize;
         private float _goatSize;
         private List<IDamage> _damageImmunitySources;
@@ -31,25 +30,35 @@ namespace Units.Player
         
         public Action<float, float> ShieldHealthChanged;
         public Action<float> DamageApplied;
-        public UnitUI UI => _unitUI;
+        private IUnitInput _inputActions;
+        private Transform _pivotTransform;
         public bool CanShieldBeActive => _health / _maxHealth > 0.1f;
         public bool IsShieldActive => _goatSize > 0f;
+        Transform IPivotFollower.PivotTransform
+        {
+            get => _pivotTransform;
+            set => _pivotTransform = value;
+        }
         
-        public void OnEnable()
+        IUnitInput IUnitActionController.InputActions
+        {
+            get => _inputActions;
+            set => _inputActions = value;
+        }
+        
+        public void Start()
         {
             _damageImmunitySources = new List<IDamage>();
             _health = _maxHealth;
-            _playerInput.ShieldStarted += ShieldStarted ;
-            _playerInput.ShieldCanceled += ShieldCanceled;
-            SetUIElement();
+            _inputActions.Spell1Started += ShieldStarted ;
+            _inputActions.Spell1Canceled += ShieldCanceled;
             ShieldHealthChanged?.Invoke(_health, _maxHealth);
         }
 
         private void OnDisable()
         {
-            _playerInput.ShieldStarted -= ShieldStarted;
-            _playerInput.ShieldCanceled -= ShieldCanceled;
-            RemoveUIElement();
+            _inputActions.Spell1Started -= ShieldStarted;
+            _inputActions.Spell1Canceled -= ShieldCanceled;
         }
 
         private void ShieldStarted()
@@ -63,7 +72,7 @@ namespace Units.Player
             _currentSize = Mathf.Lerp(_currentSize, _goatSize, Time.deltaTime * _sizeChangeSpeed);
             _shield.transform.localScale = Vector3.one * _currentSize;
 
-            transform.position = _playerInput.transform.position;
+            transform.position = _pivotTransform.position;
             Regenerate();
             
             if (IsShieldActive)
@@ -118,17 +127,12 @@ namespace Units.Player
         {
             _goatSize = 0f;
         }
-        
-        public void SetUIElement()
-        {
-            _shieldBar = Instantiate(_shieldBarPrefab);
-            ShieldHealthChanged += _shieldBar.FillBar;
-            UI.Add(_shieldBar);
-        }
 
-        public void RemoveUIElement()
+        public UIElement GetUIElement()
         {
-            ShieldHealthChanged -= _shieldBar.FillBar;
+            var shieldBar = Instantiate(_shieldBarPrefab);
+            ShieldHealthChanged += shieldBar.FillBar;
+            return shieldBar;
         }
     }
 }

@@ -1,18 +1,41 @@
-using System;
-using Units.Player.Spells;
+using PivotConnection;
+using Units.Input;
 using UnityEngine;
 
 namespace Units.Player
 {
-    public class Player : Unit
+    public class Player : Unit, IPivot, IUnitActionController 
     {
-        [Header("Player settings")]
+        [SerializeField] private Transform _pivotTransform;
+        [SerializeField] private PhysicalMover _physicalMover;
         [SerializeField] private Rigidbody _rigidbody;
-        [SerializeField] private PlayerMover _physicalMover;
-        [SerializeField] private PlayerInput _playerInput;
-        [SerializeField] private Shield _shield;
-        
-        public PlayerInput PlayerInput => _playerInput;
-        
+        private IUnitInput _inputActions;
+        public Transform PivotTransform => _pivotTransform;
+
+        private void Start()
+        {
+            _inputActions.RunStarted += _physicalMover.RunStarted;
+            _inputActions.RunCanceled += _physicalMover.RunCanceled;
+        }
+
+        private void OnDisable()
+        {
+            _inputActions.RunStarted -= _physicalMover.RunStarted;
+            _inputActions.RunCanceled -= _physicalMover.RunCanceled;
+        }
+
+        private void Update()
+        {
+            var moveDirection = (_inputActions.MoveDirection.y * _rigidbody.transform.forward + 
+                                 _inputActions.MoveDirection.x * _rigidbody.transform.right);
+            _physicalMover.SetMoveDirection(moveDirection);
+            _physicalMover.SetRotationDegree(_inputActions.Rotation);
+        }
+
+        IUnitInput IUnitActionController.InputActions
+        {
+            get => _inputActions;
+            set => _inputActions = value;
+        }
     }
 }

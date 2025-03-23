@@ -7,14 +7,6 @@ namespace Units
 {
     public abstract class Unit : MonoBehaviour
     {
-        private void Awake()
-        {
-            Initialized();
-        }
-
-        protected virtual void Initialized()
-        {
-        }
         
     }
 }

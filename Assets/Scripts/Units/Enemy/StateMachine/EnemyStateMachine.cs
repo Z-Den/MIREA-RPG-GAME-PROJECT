@@ -26,14 +26,15 @@ namespace Units.Enemy.StateMachine
                 case DefaultStateType.Patrol:
                     _defaultState = new Patrol(enemy);
                     break;
+                case DefaultStateType.RoombaPatrol:
+                    _defaultState = new RoombaPatrol(enemy);
+                    break;
             }   
             
             switch (_dangerStateTypeState)
             {
                 case DangerStateType.Follow:
                     _dangerState = new Follow(enemy);
-                    break;
-                case DangerStateType.FollowAndAttack:
                     break;
                 case DangerStateType.KeepDistanceAndAttack:
                     _dangerState = new KeepDistanceAndAttack(enemy);

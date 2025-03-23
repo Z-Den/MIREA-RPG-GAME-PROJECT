@@ -15,9 +15,8 @@ namespace Units.Enemy
         public EnemyParameters Parameters => _parameters;
         public EnemyStateMachine StateMachine => _stateMachine;
         
-        protected override void Initialized()
+        protected void Awake()
         { 
-            base.Initialized();
             _stateMachine.Init(this);
         }
 

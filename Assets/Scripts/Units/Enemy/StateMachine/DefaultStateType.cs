@@ -5,5 +5,6 @@ namespace Units.Enemy.StateMachine
         Off,
         Idle,
         Patrol,
+        RoombaPatrol,
     }
 }

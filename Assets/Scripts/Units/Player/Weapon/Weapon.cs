@@ -1,53 +1,56 @@
 using System;
 using System.Collections;
 using DamageSystem;
+using PivotConnection;
+using Units.Input;
 using Units.UI;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Units.Player.Weapon
 {
-    public class Weapon : MonoBehaviour, IUIElementHolder
+    public class Weapon : MonoBehaviour,IUnitActionController, IUIElementHolder, IPivotFollower
     {
+        [SerializeField] private Vector3 _offset;
         [SerializeField] private LayerMask _damageMask;
         [SerializeField] private Rigidbody _rigidbody;
         [SerializeField] private float _recoilPower = 1000;
         [SerializeField] private float _shotCooldown = 30f;
         [SerializeField] private float _shotChargeTime = 30f;
         [SerializeField] private PhysicalMover _physicalMover;
-        [SerializeField] private Transform _pivot;
         [SerializeField] private TrailRenderer _trailPrefab;
         [SerializeField] private float _trailSpeed = 20f; 
         [SerializeField] private float _shootDistance;
-        [SerializeField] private PlayerInput _playerInput;
         [Header("UI")]
-        [SerializeField] private UnitUI _unitUI;
         [SerializeField] private PlayerShootBar _shootBarPrefab;
         [SerializeField] private Bar _swordRunesBar;
-        public UnitUI UI => _unitUI;
         private float _cooldown;
         private float _shotChargeTimer;
-        private PlayerShootBar _shotBar;
 
         private bool IsCanShoot => _cooldown <= 0;
         
         public Action<float, float> CooldownChanged;
         public Action<float, float> ChargeTimerChanged;
+        private Transform _pivotTransform;
+        private IUnitInput _inputActions;
 
-        private void OnEnable()
+        Transform IPivotFollower.PivotTransform
         {
-            _playerInput.ShotStarted += StartChargeShot;
-            _playerInput.ShotCanceled += Shot;
-            SetUIElement();
+            get => _pivotTransform;
+            set => _pivotTransform = value;
+        }
+        
+        private void Start()
+        {   
+            _inputActions.ShotStarted += StartChargeShot;
+            _inputActions.ShotCanceled += Shot;
             CooldownChanged?.Invoke(0, 1);
             ChargeTimerChanged?.Invoke(1, 1);
         }
 
         private void OnDisable()
         {
-            RemoveUIElement();
-            _playerInput.ShotStarted -= StartChargeShot;
-            _playerInput.ShotCanceled -= Shot;
+            _inputActions.ShotStarted -= StartChargeShot;
+            _inputActions.ShotCanceled -= Shot;
         }
 
         private void StartChargeShot()
@@ -63,11 +66,11 @@ namespace Units.Player.Weapon
             UpdateTimer(ref _cooldown, ref _shotCooldown, ref CooldownChanged);
             UpdateTimer(ref _shotChargeTimer, ref _shotChargeTime, ref ChargeTimerChanged);
             
-            if (!_pivot)
+            if (!_pivotTransform)
                 return;
             
-            _physicalMover.SetMoveDirection(_pivot.position - transform.position);
-            _physicalMover.SetRotation(_pivot.rotation);
+            _physicalMover.SetMoveDirection((_pivotTransform.position + transform.forward * _offset.z) - transform.position);
+            _physicalMover.SetRotation(_pivotTransform.rotation);
         }
 
         private void UpdateTimer(ref float timer, ref float cooldown, ref Action<float, float> callback)
@@ -118,20 +121,19 @@ namespace Units.Player.Weapon
             Destroy(trail.gameObject);
         }
 
-        public void SetUIElement()
+        public UIElement GetUIElement()
         {
-            _shotBar = Instantiate(_shootBarPrefab);
-            CooldownChanged += _shotBar.CooldownChanged;
-            ChargeTimerChanged += _shotBar.ChargeTimerChanged;
+            var shotBar = Instantiate(_shootBarPrefab);
+            CooldownChanged += shotBar.CooldownChanged;
+            ChargeTimerChanged += shotBar.ChargeTimerChanged;
             ChargeTimerChanged += _swordRunesBar.UpdateBar;
-            UI.Add(_shotBar);
+            return shotBar;
         }
 
-        public void RemoveUIElement()
+        IUnitInput IUnitActionController.InputActions
         {
-            CooldownChanged -= _shotBar.CooldownChanged;
-            ChargeTimerChanged -= _shotBar.ChargeTimerChanged;
-            ChargeTimerChanged -= _swordRunesBar.UpdateBar;
+            get => _inputActions;
+            set => _inputActions = value;
         }
     }
 }

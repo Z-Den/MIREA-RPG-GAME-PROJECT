@@ -1,9 +1,12 @@
+using System;
+using Units.Input;
+using Units.UI;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Units
 {
-    public class PhysicalMover : MonoBehaviour
+    [RequireComponent(typeof(Rigidbody))]
+    public class PhysicalMover : MonoBehaviour, IUIElementHolder
     {
         [Header("Ground Ray")]
         [SerializeField] private float _distanceToFloor = 0.6f;
@@ -19,17 +22,80 @@ namespace Units
         [SerializeField] private float _springDamper = 100f;
         [SerializeField] private float _rotationSpringStrength = 100f;
         [SerializeField] private float _rotationSpringDamper = 20f;
-        [SerializeField] protected Rigidbody Rigidbody;
+        [Header("Stamina")]
+        [SerializeField] private float _maxSpeedMultiplier = 2;
+        [SerializeField] private float _maxStamina;
+        [SerializeField] private float _staminaRegenPerSecond;
+        [SerializeField] private float _staminaSpendPerSecond;
+        [Header("UI")]
+        [SerializeField] private TwoSideBar _staminaBarPrefab;
         private Quaternion _targetRotation;
+        private Rigidbody _rigidbody;
         private Vector3 _moveVector;
         private Vector3 _goalVelocity;
         private Vector3 _direction;
         private float _degree;
         private float _sensitivity = 0.1f;
-
+        private float _stamina;
+        private float _speedMultiplier = 1f;
+        private bool _isRunning;
+        
+        public Action<float, float> OnStaminaChanged;
         public bool IsOnGround { get; private set; }
-        public virtual float MaxSpeed => _maxSpeed;
+        public float MaxSpeed => _maxSpeed * _speedMultiplier;
+        
+        private void Start()
+        {
+            _rigidbody = GetComponent<Rigidbody>();
+            _stamina = _maxStamina;
+            OnStaminaChanged?.Invoke(_stamina, _maxStamina);
+        }
 
+        public void RunStarted()
+        {
+            if (_stamina / _maxStamina < 0.1f)
+                return;
+            
+            _speedMultiplier = _maxSpeedMultiplier;
+            _isRunning = true;
+        }
+        
+        public void RunCanceled()
+        {
+            _speedMultiplier = 1f;
+            _isRunning = false;
+        }
+        
+        private void Update()
+        {
+            Regenerate();
+            Spend();
+            
+            if (_stamina <= 0)
+            {
+                _stamina = 0;
+                RunCanceled();
+            }
+        }
+        
+        private void Regenerate()
+        {
+            if (_stamina < _maxStamina && !_isRunning)
+            {
+                _stamina += Time.deltaTime * _staminaRegenPerSecond;
+                OnStaminaChanged?.Invoke(_stamina, _maxStamina);
+            }
+        }
+
+        private void Spend()
+        {
+            if (_stamina > 0 && _isRunning)
+            {
+                _stamina -= Time.deltaTime * _staminaSpendPerSecond;
+                OnStaminaChanged?.Invoke(_stamina, _maxStamina);
+            }
+        }
+        
         public void SetMoveDirection(Vector3 directoion)
         {
             _direction = directoion;
@@ -66,20 +132,20 @@ namespace Units
             var move = _direction;
             if (move.magnitude > 1f) move.Normalize();
             
-            var velocityDot = Vector3.Dot(move, Rigidbody.linearVelocity);
+            var velocityDot = Vector3.Dot(move, _rigidbody.linearVelocity);
             var acceleration = _accelerationPower * _accelerationFromDot.Evaluate(velocityDot);
 
             var velocity = move * MaxSpeed;
             _goalVelocity = Vector3.MoveTowards(_goalVelocity, velocity, acceleration * Time.fixedDeltaTime);
 
-            var neededAccel = (_goalVelocity - Rigidbody.linearVelocity) / Time.fixedDeltaTime;
+            var neededAccel = (_goalVelocity - _rigidbody.linearVelocity) / Time.fixedDeltaTime;
             neededAccel = Vector3.ClampMagnitude(neededAccel, _maxAcceleration);
-            Rigidbody.AddForce(neededAccel * Rigidbody.mass);
+            _rigidbody.AddForce(neededAccel * _rigidbody.mass);
         }
 
         private void Floating(RaycastHit hit)
         {
-            var velocity = Rigidbody.linearVelocity;
+            var velocity = _rigidbody.linearVelocity;
             var rayDirection = -Vector3.up;
 
             var otherVelocity = Vector3.zero;
@@ -93,7 +159,7 @@ namespace Units
             var relVel = rayDirVelocity - otherDirVelocity;
             var deltaX = hit.distance - _distanceToFloor;
             var springForce = (deltaX * _springStrength) - (relVel * _springDamper);
-            Rigidbody.AddForce(rayDirection * springForce);
+            _rigidbody.AddForce(rayDirection * springForce);
 
             if (hitbody)
                 hitbody.AddForceAtPosition(rayDirection * -springForce, hit.point);
@@ -101,7 +167,7 @@ namespace Units
 
         private void RotationStabilization()
         {
-            var toGoal = _targetRotation * Quaternion.Inverse(Rigidbody.transform.rotation);
+            var toGoal = _targetRotation * Quaternion.Inverse(_rigidbody.transform.rotation);
 
             toGoal.ToAngleAxis(out var rotDegrees, out var rotAxis);
             rotAxis.Normalize();
@@ -111,14 +177,24 @@ namespace Units
             
             var rotRadians = rotDegrees * Mathf.Deg2Rad;
             
-            Rigidbody.AddTorque((rotAxis * (rotRadians * _rotationSpringStrength)) -
-                                 (Rigidbody.angularVelocity * _rotationSpringDamper));
+            _rigidbody.AddTorque((rotAxis * (rotRadians * _rotationSpringStrength)) -
+                                 (_rigidbody.angularVelocity * _rotationSpringDamper));
         }
 
         private bool CheckGround(out RaycastHit hit)
         {
-            return Physics.Raycast(Rigidbody.transform.position, -Vector3.up, 
+            return Physics.Raycast(_rigidbody.transform.position, -Vector3.up, 
                 out hit, _distanceToFloor * 2, _groundLayers);
+        }
+
+        public UIElement GetUIElement()
+        {
+            if (_staminaBarPrefab == null)
+                return null;
+            
+            var staminaBar = Instantiate(_staminaBarPrefab);
+            OnStaminaChanged += staminaBar.FillBar;
+            return staminaBar;
         }
     }
 }
